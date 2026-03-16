@@ -1,0 +1,34 @@
+name: Deploy Spring Boot to Docker Hub
+
+# Chạy mỗi khi Push code lên nhánh main
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Action lấy code từ Github (Robot 1 trong Slide)
+      - name: Checkout repository
+        uses: actions/checkout@v4 
+
+      # 2. Action Đăng nhập Docker Hub (Robot 2 trong Slide)
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3 
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 3. Action Đóng gói & Đẩy Image (Robot 3 trong Slide)
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5 
+        with:
+          context: .
+          push: true
+          # Yêu cầu: "Sử dụng tags" 
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/ducanhtrinh:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/ducanhtrinh:${{ github.sha }}
